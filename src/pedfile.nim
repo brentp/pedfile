@@ -213,13 +213,14 @@ proc parse_ped*(path: string, verbose:bool=true): seq[Sample] =
     result.add(s)
     look[s.id] = s
 
+  var missing_parents = newSeq[string]()
   for s in result:
     if s.paternal_id in look:
       s.dad = look[s.paternal_id]
       s.dad.kids.add(s)
     elif not (s.paternal_id in @[".", "-9", "", "0"]):
       if verbose:
-        stderr.write_line &"[pedfile] paternal_id: \"{s.paternal_id}\" referenced for sample \"{s.id}\" not found"
+        missing_parents.add(s.paternal_id)
       s.dad = missing.mgetOrPut(s.paternal_id, Sample(family_id:s.family_id, id: s.paternal_id, i: -1, sex: 1))
       s.dad.kids.add(s)
 
@@ -228,9 +229,11 @@ proc parse_ped*(path: string, verbose:bool=true): seq[Sample] =
       s.mom.kids.add(s)
     elif not (s.maternal_id in @[".", "-9", "", "0"]):
       if verbose:
-        stderr.write_line &"[pedfile] maternal_id: \"{s.maternal_id}\" referenced for sample \"{s.id}\" not found"
+        missing_parents.add(s.maternal_id)
       s.mom = missing.mgetOrPut(s.maternal_id, Sample(family_id:s.family_id, id: s.maternal_id, i: -1, sex: 2))
       s.mom.kids.add(s)
+  if verbose and missing_parents.len > 0:
+    stderr.write_line &"""[pedfile] parents referenced by other samples that were not present in pedigree file: {join(missing_parents, ",")}"""
 
 type Sampler* = concept v
   v.samples() is seq[string]
