@@ -2,7 +2,7 @@
 
 
 # Package
-version       = "0.0.2"
+version       = "0.0.3"
 author        = "Brent Pedersen"
 description   = "pedfile parsing and evalution"
 license       = "MIT"

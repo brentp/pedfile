@@ -1,7 +1,7 @@
-import strutils
 import math
 import algorithm
 import strformat
+import strutils
 import hashes
 import sets
 import tables
@@ -180,7 +180,7 @@ proc parse_ped*(path: string, verbose:bool=true): seq[Sample] =
     var toks = line.strip().split('\t')
     var likely_header = i == 0 and toks[0].toLowerAscii in ["family_id", "familyid", "famid", "kindred_id", "kindredid", "family id", "kindred id"]
     if toks.len < 6:
-      stderr.write_line "[pedfile] error: expected at least 5 tab-delimited columns in ped file: " & path
+      stderr.write_line "[pedfile] error: expected at least 6 tab-delimited columns in ped file: " & path
       stderr.write_line "[pedfile] error: line was:" & $toks
 
 
