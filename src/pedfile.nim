@@ -7,9 +7,9 @@ import sets
 import tables
 
 
-const version* = "0.0.2"
+const version* = "0.0.4"
 
-type PedigreeError* = object of Exception
+type PedigreeError* = object of ValueError
 
 type Pair* = object
    key*: string
@@ -218,6 +218,8 @@ proc parse_ped*(path: string, verbose:bool=true): seq[Sample] =
     if s.paternal_id in look:
       s.dad = look[s.paternal_id]
       s.dad.kids.add(s)
+      if s.dad.sex == 2:
+        stderr.write_line &"[pedfile] dad ({s.dad.id}) for sample: {s.id} was indicated as female"
     elif not (s.paternal_id in @[".", "-9", "", "0"]):
       if verbose:
         missing_parents.add(s.paternal_id)
@@ -227,6 +229,8 @@ proc parse_ped*(path: string, verbose:bool=true): seq[Sample] =
     if s.maternal_id in look:
       s.mom = look[s.maternal_id]
       s.mom.kids.add(s)
+      if s.mom.sex == 1:
+        stderr.write_line &"[pedfile] mom ({s.mom.id}) for sample: {s.id} was indicated as male"
     elif not (s.maternal_id in @[".", "-9", "", "0"]):
       if verbose:
         missing_parents.add(s.maternal_id)
